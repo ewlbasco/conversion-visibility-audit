@@ -1,0 +1,3 @@
+name: qa-audit
+description: Validate audit outputs for completeness and accuracy
+instructions: skills/qa-audit/SKILL.md

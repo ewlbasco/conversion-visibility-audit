@@ -10,7 +10,7 @@ import sys
 
 
 ROOT = Path(__file__).resolve().parent.parent
-SKILLS = ("website-audit", "conversion-engine", "visibility-audit")
+SKILLS = ("website-audit", "conversion-engine", "visibility-audit", "qa-audit", "creative-director")
 REQUIRED_EVAL_FILES = (
     "routing-cases.json",
     "conversion-layer-cases.json",
@@ -21,6 +21,9 @@ FORBIDDEN_TEXT = (
     "/Users/",
     "EDGEWISE_WORKSPACE_MASTER",
     "license: Proprietary",
+    "Cynthia",
+    "cynthiadn",
+    "Edgewise",
 )
 
 
@@ -153,7 +156,7 @@ def main() -> int:
             failures.append(f"conversion-engine is missing required phrase: {phrase}")
 
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    if not re.search(r"Freshness check:\s*2026-06-29", readme):
+    if not re.search(r"Freshness check:\s*2026-07-01", readme):
         failures.append("README is missing the current freshness check")
 
     if failures:

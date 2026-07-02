@@ -22,7 +22,7 @@ difficult to convert, then identify what should be fixed first.
 **Tool status:** the self-serve web app is being built separately. This
 repository is the skill version people can use right now inside their agent.
 
-Freshness check: 2026-06-29. A current GitHub benchmark found broad SEO skill
+Freshness check: 2026-07-01. A current GitHub benchmark found broad SEO skill
 suites, but no stronger equivalent combining evidence-gated conversion and
 visibility routing in one portable package.
 
@@ -33,6 +33,8 @@ skills/
   website-audit/       # Entry point and router
   conversion-engine/   # Copy, offer, trust, CTA, and funnel diagnosis
   visibility-audit/    # SEO, GEO, AEO, crawlability, and AI citability
+  qa-audit/            # Validate audit outputs before delivery
+  creative-director/   # Review gate for diagnosis completeness
 evals/
   routing-cases.json
   conversion-layer-cases.json
@@ -49,6 +51,7 @@ skills instead of duplicating their methods.
 
 - One entry skill: `website-audit`
 - Three choices: Conversion Audit, Visibility Audit, or Full Website Audit
+- Two quality layers: `qa-audit` (output validation) + `creative-director` (review gate)
 - One free-diagnosis model: audit first, rewrite later
 - One clear boundary: the self-serve tool is still in progress
 
@@ -84,6 +87,8 @@ mkdir -p ~/.agents/skills/research
 cp -R skills/website-audit ~/.agents/skills/research/
 cp -R skills/conversion-engine ~/.agents/skills/research/
 cp -R skills/visibility-audit ~/.agents/skills/research/
+cp -R skills/qa-audit ~/.agents/skills/research/
+cp -R skills/creative-director ~/.agents/skills/research/
 ```
 
 Full flow:
