@@ -146,6 +146,7 @@ class AuditRequestHandler(SimpleHTTPRequestHandler):
             )
             return
 
+        slug = slugify(audit["url"])
         self.send_json(
             {
                 "report_id": report_id,
@@ -153,6 +154,8 @@ class AuditRequestHandler(SimpleHTTPRequestHandler):
                 "download_url": f"/api/report/{report_id}/download",
                 "pptx_url": f"/api/report/{report_id}/pptx",
                 "specialist_url": f"/reports/{report_id}-specialist.html",
+                "index_url": f"/reports/{slug}-index.html",
+                "rebuild_url": f"/reports/{report_id}-rebuild.html",
                 "brand": audit["brand"]["name"],
                 "mode": audit["mode"],
                 "url": audit["url"],

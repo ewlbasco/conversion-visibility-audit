@@ -96,6 +96,19 @@ form.addEventListener("submit", async (event) => {
     openReport.href = data.report_url;
     downloadReport.href = data.download_url;
     openSpecialist.href = data.specialist_url;
+    if (data.index_url) {
+      var indexLink = document.getElementById("open-index") || (function() {
+        var a = document.createElement("a");
+        a.id = "open-index";
+        a.className = "action-button action-button--primary";
+        a.target = "_blank";
+        a.rel = "noopener";
+        a.textContent = "Open overview";
+        document.querySelector(".result-actions").insertBefore(a, document.querySelector(".result-actions").firstChild);
+        return a;
+      })();
+      indexLink.href = data.index_url;
+    }
     document.querySelector("#result-title").textContent = `${data.brand} audit complete`;
     document.querySelector("#result-subtitle").textContent = `${data.mode} audit · ${data.url}`;
     document.querySelector("#conversion-score").textContent = payload.mode === "visibility" ? "N/A" : `${data.conversion_score}/100`;
