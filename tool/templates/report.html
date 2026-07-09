@@ -660,7 +660,7 @@
 
   <footer class="report-footer">
     <strong>{{ audit.brand.name }}</strong>
-    <small>Website Audit · Evidence engine by Edgewise · {{ audit.generated_at[:10] }}</small>
+    <small>Website Audit · {{ audit.generated_at[:10] }}</small>
   </footer>
 
   <script>
@@ -669,8 +669,9 @@
     function toggleEdit() {
       var btn = document.getElementById("toggle-edit");
       var isEditing = document.body.classList.toggle("is-editing");
-      var els = document.querySelectorAll("[contenteditable]");
+      var els = document.querySelectorAll("main h1, main h2, main h3, main p, main li, main blockquote, main strong, main span, main dt, main dd");
       for (var i = 0; i < els.length; i++) {
+        if (els[i].closest(".report-nav")) continue;
         els[i].setAttribute("contenteditable", isEditing ? "true" : "false");
       }
       btn.textContent = isEditing ? "Done editing" : "Edit";
@@ -682,7 +683,7 @@
       var data = {};
       var els = document.querySelectorAll("[contenteditable]");
       for (var i = 0; i < els.length; i++) {
-        var key = els[i].tagName + "-" + i + "-" + (els[i].className || "x");
+        var key = els[i].tagName + "-" + i;
         data[key] = els[i].innerHTML;
       }
       try {
@@ -700,7 +701,7 @@
         var data = JSON.parse(raw);
         var els = document.querySelectorAll("[contenteditable]");
         for (var i = 0; i < els.length; i++) {
-          var key = els[i].tagName + "-" + i + "-" + (els[i].className || "x");
+          var key = els[i].tagName + "-" + i;
           if (data[key]) els[i].innerHTML = data[key];
         }
       } catch (e) {}

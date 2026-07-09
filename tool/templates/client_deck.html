@@ -182,8 +182,6 @@
       <button class="button button--edit" type="button" id="toggle-edit" onclick="toggleEdit()">Edit</button>
       <button class="button" type="button" onclick="saveEdits()">Save</button>
       <button class="button" type="button" onclick="downloadSelf()">Export HTML</button>
-      <a class="button button--primary" href="{{ report_id }}.pptx" download>PowerPoint</a>
-      <a class="button" href="{{ report_id }}-specialist.html">Details</a>
     </div>
   </nav>
   <div id="toast" class="toast"></div>
@@ -359,7 +357,7 @@
         {% if audit.client_review.main_next_step %}
         <p class="lead"><strong>Main next step:</strong> {{ audit.client_review.main_next_step }}</p>
         {% endif %}
-        <p class="lead">The editable Word file lets you change the wording before sharing or exporting a final PDF. The internal report keeps the technical evidence for the person doing the work.</p>
+        <p class="lead">The internal report keeps the technical evidence for the person doing the work.</p>
       </div>
     </section>
   </main>
@@ -370,8 +368,10 @@
     function toggleEdit() {
       var btn = document.getElementById("toggle-edit");
       var isEditing = document.body.classList.toggle("is-editing");
-      var els = document.querySelectorAll("[contenteditable]");
+      var els = document.querySelectorAll(".slide h1, .slide h2, .slide h3, .slide p, .slide li, .slide blockquote, .slide .score, .slide strong, .slide span");
       for (var i = 0; i < els.length; i++) {
+        if (els[i].closest(".actions")) continue;
+        if (els[i].closest(".cover__meta")) continue;
         els[i].setAttribute("contenteditable", isEditing ? "true" : "false");
       }
       btn.textContent = isEditing ? "Done editing" : "Edit";
@@ -383,7 +383,7 @@
       var data = {};
       var els = document.querySelectorAll("[contenteditable]");
       for (var i = 0; i < els.length; i++) {
-        var key = els[i].tagName + "-" + i + "-" + (els[i].className || "x");
+        var key = els[i].tagName + "-" + i;
         data[key] = els[i].innerHTML;
       }
       try {
@@ -401,7 +401,7 @@
         var data = JSON.parse(raw);
         var els = document.querySelectorAll("[contenteditable]");
         for (var i = 0; i < els.length; i++) {
-          var key = els[i].tagName + "-" + i + "-" + (els[i].className || "x");
+          var key = els[i].tagName + "-" + i;
           if (data[key]) els[i].innerHTML = data[key];
         }
       } catch (e) {}

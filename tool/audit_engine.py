@@ -735,23 +735,34 @@ class AuditEngine:
         name = schema_names[0] if schema_names else title_name or urlsplit(homepage.url).hostname or "Website"
 
         colors = Counter(normalize_hex(match) for match in HEX_RE.findall(css_text))
-        usable = [
-            color
-            for color, _ in colors.most_common(30)
-            if relative_luminance(color) < 0.97
-        ]
-        dark_candidates = [color for color in usable if relative_luminance(color) < 0.18]
-        primary = dark_candidates[0] if dark_candidates else (usable[0] if usable else "#1f2937")
-        chromatic_candidates = [
-            color
-            for color in usable
-            if max(hex_rgb(color)) - min(hex_rgb(color)) >= 35
-            and 0.05 < relative_luminance(color) < 0.85
-        ]
-        accent = next(
-            (color for color in chromatic_candidates if color_distance(primary, color) > 70),
-            "#b85c38",
+        all_usable = [c for c, _ in colors.most_common(100) if relative_luminance(c) < 0.97]
+
+        var_colors: dict[str, str] = {}
+        for var_match in re.finditer(r"(--[\w-]+)\s*:\s*(#[0-9a-fA-F]{3,6})\s*", css_text):
+            vname = var_match.group(1).lower()
+            vhex = normalize_hex(var_match.group(2).lstrip("#"))
+            var_colors[vname] = vhex
+
+        primary_hint = next(
+            (h for name, h in var_colors.items() if any(k in name for k in ("brand", "primary", "navy", "dark"))),
+            "",
         )
+        accent_hint = next(
+            (h for name, h in var_colors.items() if any(k in name for k in ("accent", "orange", "secondary", "highlight", "cta"))),
+            "",
+        )
+
+        if primary_hint:
+            primary = primary_hint
+        else:
+            dark_candidates = [c for c in all_usable if relative_luminance(c) < 0.18]
+            primary = dark_candidates[0] if dark_candidates else (all_usable[0] if all_usable else "#1f2937")
+
+        if accent_hint and color_distance(primary, accent_hint) > 40:
+            accent = accent_hint
+        else:
+            chromatic = [c for c in all_usable if max(hex_rgb(c)) - min(hex_rgb(c)) >= 35 and 0.05 < relative_luminance(c) < 0.85]
+            accent = next((c for c in chromatic if color_distance(primary, c) > 70), "#b85c38")
         variable_fonts: dict[str, str] = {}
         for variable_name, raw_value in re.findall(r"(--[\w-]+)\s*:\s*([^;}{]+)", css_text, re.I):
             candidate = raw_value.split(",")[0].strip().strip("'\"")
