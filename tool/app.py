@@ -155,7 +155,6 @@ class AuditRequestHandler(SimpleHTTPRequestHandler):
                 "pptx_url": f"/api/report/{report_id}/pptx",
                 "specialist_url": f"/reports/{report_id}-specialist.html",
                 "index_url": f"/reports/{slug}-index.html",
-                "rebuild_url": f"/reports/{report_id}-rebuild.html",
                 "brand": audit["brand"]["name"],
                 "mode": audit["mode"],
                 "url": audit["url"],

@@ -48,10 +48,8 @@
     .link--external .link-icon { background: #e8e4dc; color: var(--muted); }
     .link--report .link-icon { background: {{ brand.primary_hex }}; color: var(--white); }
     .link--specialist .link-icon { background: color-mix(in srgb, {{ brand.primary_hex }} 85%, white); color: var(--white); }
-    .link--rebuild .link-icon { background: {{ brand.accent_hex }}; color: var(--white); }
     .link-label { font-size: 14px; font-weight: 600; }
     .link-desc { font-size: 12px; color: var(--muted); margin-top: 1px; }
-    .divider { border: none; border-top: 1px solid var(--rule); margin: 20px 0; }
     .footer { font-size: 12px; color: var(--muted); margin-top: 24px; text-align: center; }
   </style>
 </head>
@@ -76,11 +74,6 @@
       <a class="link link--specialist" href="{{ specialist_path }}" target="_blank">
         <div class="link-icon">D</div>
         <div><div class="link-label">Detailed audit</div><div class="link-desc">Specialist version with evidence, root cause, and exact fixes &mdash; editable</div></div>
-      </a>
-      <hr class="divider">
-      <a class="link link--rebuild" href="{{ rebuild_path }}" target="_blank">
-        <div class="link-icon">R</div>
-        <div><div class="link-label">Improved version</div><div class="link-desc">A redesigned version of the site applying the audit findings</div></div>
       </a>
     </div>
 
