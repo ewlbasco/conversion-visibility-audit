@@ -394,13 +394,33 @@
     .toast.show { opacity: 1; }
 
     @media print {
-      @page { margin: 14mm; size: A4; }
-      body { background: var(--color-white); }
-      .report-nav { display: none; }
-      .cover { min-height: 250mm; break-after: page; print-color-adjust: exact; }
-      .section { break-before: page; padding: 18mm 0; }
-      .finding, .priority, .score-block { break-inside: avoid; }
-      .report-footer { break-before: page; min-height: 80mm; }
+      @page { margin: 15mm 18mm; size: A4; }
+      body { background: var(--color-white); font-size: 9pt; line-height: 1.45; }
+      .report-nav, .toast { display: none; }
+      .cover { min-height: auto; padding: 30mm 18mm 20mm; print-color-adjust: exact; }
+      .cover h1 { font-size: 28pt; max-width: 20ch; }
+      .cover__summary { font-size: 10pt; margin-top: 10px; }
+      .cover__meta { font-size: 7pt; margin-bottom: 14px; }
+      .section { padding: 8mm 0; }
+      .section__head { margin-bottom: 6mm; gap: 4mm; }
+      .section__head h2 { font-size: 16pt; max-width: 30ch; }
+      .section__head p { font-size: 9pt; }
+      .score-block { min-height: auto; padding: 5mm 0 3mm; }
+      .score-block__value { font-size: 24pt; }
+      .score-grid { gap: 6mm; }
+      .layer-row { padding: 3mm 0; font-size: 8pt; }
+      .layer-row__bar { height: 5px; }
+      .priority { padding: 3mm 0; gap: 4mm; }
+      .priority h3 { font-size: 10pt; }
+      .priority__body { gap: 4mm; }
+      .priority p, .finding dd, .finding dt { font-size: 8.5pt; }
+      .finding { padding-top: 3mm; gap: 4mm; }
+      .finding h3 { font-size: 11pt; }
+      .keep-item { font-size: 9pt; padding-top: 2mm; }
+      .keep-grid { gap: 4mm; }
+      .plan li { padding: 2mm 0; gap: 4mm; font-size: 9pt; }
+      .report-footer { padding: 6mm 18mm; min-height: auto; }
+      .report-footer strong { font-size: 10pt; }
     }
   </style>
 </head>
@@ -410,6 +430,8 @@
     <div class="report-nav__actions toolbar">
       <button class="report-button report-button--edit" type="button" id="toggle-edit" onclick="toggleEdit()">Edit</button>
       <button class="report-button" type="button" onclick="saveEdits()">Save</button>
+      <a class="report-button" href="/api/report/{{ report_id }}/pdf/slide" download>PDF Slide Deck</a>
+      <a class="report-button" href="/api/report/{{ report_id }}/pdf/document" download>PDF Document</a>
       <button class="report-button" type="button" onclick="downloadSelf()">Export HTML</button>
     </div>
   </nav>

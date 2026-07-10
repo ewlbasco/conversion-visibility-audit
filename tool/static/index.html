@@ -4,119 +4,98 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <meta name="description" content="Run evidence-backed Conversion, Visibility, or Full Website Audits and receive a branded report, editable review copy, and prioritized action plan.">
-  <title>Website Audit Tool · Edgewise</title>
+  <meta name="description" content="Run evidence-backed Conversion, Visibility, or Full Website Audits and receive a branded report and prioritized action plan.">
+  <title>Website Audit Tool</title>
   <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
   <main class="app-shell">
-    <aside class="control-panel">
-      <div class="brand-lockup">
-        <strong class="brand-wordmark">Edgewise</strong>
-        <div>
-          <span>Website Audit Tool</span>
-        </div>
+    <section class="intro">
+      <p class="eyebrow">Conversion + visibility</p>
+      <h1>Find what is blocking the website.</h1>
+      <p>Get the diagnosis, evidence, priority order, and seven-day plan before anyone rewrites or rebuilds the wrong thing.</p>
+    </section>
+
+    <form class="audit-form" id="audit-form">
+      <div class="field">
+        <label for="website-url">Website URL</label>
+        <input id="website-url" name="url" type="url" inputmode="url" autocomplete="url" placeholder="https://example.com" required>
       </div>
 
-      <section class="tool-intro">
-        <p class="eyebrow">Conversion + visibility</p>
-        <h1>Find what is blocking the website.</h1>
-        <p>Get the diagnosis, evidence, priority order, and seven-day plan before anyone rewrites or rebuilds the wrong thing.</p>
-      </section>
-
-      <form class="audit-form" id="audit-form">
-        <div class="field">
-          <label for="website-url">Website URL</label>
-          <input id="website-url" name="url" type="url" inputmode="url" autocomplete="url" placeholder="https://example.com" required>
+      <fieldset class="field">
+        <legend>Audit mode</legend>
+        <div class="segmented">
+          <label>
+            <input type="radio" name="mode" value="conversion">
+            <span>Conversion</span>
+          </label>
+          <label>
+            <input type="radio" name="mode" value="visibility">
+            <span>Visibility</span>
+          </label>
+          <label>
+            <input type="radio" name="mode" value="full" checked>
+            <span>Full</span>
+          </label>
         </div>
+      </fieldset>
 
-        <fieldset class="field">
-          <legend>Audit mode</legend>
-          <div class="segmented">
-            <label>
-              <input type="radio" name="mode" value="conversion">
-              <span>Conversion</span>
-            </label>
-            <label>
-              <input type="radio" name="mode" value="visibility">
-              <span>Visibility</span>
-            </label>
-            <label>
-              <input type="radio" name="mode" value="full" checked>
-              <span>Full</span>
-            </label>
-          </div>
-        </fieldset>
-
-        <div class="field">
-          <label for="desired-outcome">Desired outcome <span aria-hidden="true">·</span> optional</label>
-          <textarea id="desired-outcome" name="intent" maxlength="4000" placeholder="What should this website achieve? For example: more qualified inquiries, bookings, sales, or visibility."></textarea>
-          <small>Only add what the website cannot tell us. The audit should infer the buyer, offer, and positioning from the site itself.</small>
-        </div>
-
-        <button class="run-button" id="run-button" type="submit" data-state="default">
-          <span id="run-label">Run Full Audit</span>
-          <span aria-hidden="true">→</span>
-        </button>
-      </form>
-
-      <div class="panel-note">
-        <strong>Three useful files</strong>
-        <span>Client deck, editable HTML, and specialist report.</span>
+      <div class="field">
+        <label for="desired-outcome">Desired outcome <span aria-hidden="true">·</span> optional</label>
+        <textarea id="desired-outcome" name="intent" maxlength="4000" placeholder="What should this website achieve? For example: more qualified inquiries, bookings, sales, or visibility."></textarea>
+        <small>Only add what the website cannot tell us. The audit should infer the buyer, offer, and positioning from the site itself.</small>
       </div>
-    </aside>
+
+      <button class="run-button" id="run-button" type="submit" data-state="default">
+        <span id="run-label">Run Full Audit</span>
+        <span aria-hidden="true">→</span>
+      </button>
+    </form>
 
     <section class="workspace">
-      <header class="workspace-header">
-        <h2>Audit workspace</h2>
-        <div class="status-pill"><span class="status-dot" aria-hidden="true"></span> Local engine ready</div>
-      </header>
-
-      <div class="workspace-body">
-        <section class="empty-state" id="empty-state">
-          <p class="eyebrow">What you receive</p>
-          <h2>A diagnosis you can act on.</h2>
-          <p>The tool checks the public pages, message, offers, forms, search setup, language, and visible brand cues.</p>
-          <div class="workflow-line">
-            <div><strong>01 · Understand</strong><span>What visitors understand, what works, and where they may hesitate</span></div>
-            <div><strong>02 · Choose</strong><span>The first changes that will make the buying decision easier</span></div>
-            <div><strong>03 · Improve</strong><span>Rewrite the copy only after the offer and message are clear</span></div>
-          </div>
-          <p class="engine-boundary"><strong>Still checked separately:</strong> the fully rendered design, speed data, analytics, backlinks, search rankings, competitors, and live AI citations.</p>
-        </section>
-
-        <section class="loading-state" id="loading-state" aria-hidden="true" aria-live="polite">
-          <h2 id="loading-title">Collecting evidence</h2>
-          <div class="loading-track" aria-hidden="true"><span></span></div>
-          <p class="loading-steps" id="loading-step">Checking public routes, metadata, offers, forms, schema, and brand cues.</p>
-        </section>
-
-        <section class="result-state" id="result-state" aria-hidden="true" aria-live="polite">
-          <div class="result-head">
-            <div>
-              <h2 id="result-title">Audit complete</h2>
-              <p id="result-subtitle"></p>
-            </div>
-            <div class="result-actions">
-              <a class="action-button action-button--primary" id="open-report" href="#" target="_blank" rel="noopener">Open client deck</a>
-              <a class="action-button" id="open-specialist" href="#" target="_blank" rel="noopener">Specialist report</a>
-              <a class="action-button" id="download-report" href="#">Download HTML</a>
-              <button class="action-button" id="new-audit" type="button">New audit</button>
-            </div>
-          </div>
-          <div class="result-metrics">
-            <div class="metric"><strong id="conversion-score">—</strong><span>Conversion</span></div>
-            <div class="metric"><strong id="visibility-score">—</strong><span>Visibility</span></div>
-            <div class="metric"><strong id="root-layer">—</strong><span>Root layer</span></div>
-            <div class="metric"><strong id="priority-count">—</strong><span>Priority fixes</span></div>
-          </div>
-        </section>
-
-        <section class="error-state" id="error-state" aria-hidden="true" role="alert">
-          <h2>Audit could not finish</h2>
-          <p id="error-message">Check the URL and try again.</p>
-        </section>
+      <div class="empty-state" id="empty-state">
+        <p class="eyebrow">What you receive</p>
+        <h2>A diagnosis you can act on.</h2>
+        <p>The tool checks the public pages, message, offers, forms, search setup, language, and visible brand cues.</p>
+        <div class="workflow-line">
+          <div><strong>01 · Understand</strong><span>What visitors understand, what works, and where they may hesitate</span></div>
+          <div><strong>02 · Choose</strong><span>The first changes that will make the buying decision easier</span></div>
+          <div><strong>03 · Improve</strong><span>Rewrite the copy only after the offer and message are clear</span></div>
+        </div>
+        <p class="engine-boundary"><strong>Still checked separately:</strong> the fully rendered design, speed data, analytics, backlinks, search rankings, competitors, and live AI citations.</p>
       </div>
+
+      <section class="loading-state" id="loading-state" aria-hidden="true" aria-live="polite">
+        <h2 id="loading-title">Collecting evidence</h2>
+        <div class="loading-track" aria-hidden="true"><span></span></div>
+        <p class="loading-steps" id="loading-step">Checking public routes, metadata, offers, forms, schema, and brand cues.</p>
+      </section>
+
+      <section class="result-state" id="result-state" aria-hidden="true" aria-live="polite">
+        <div class="result-head">
+          <div>
+            <h2 id="result-title">Audit complete</h2>
+            <p id="result-subtitle"></p>
+          </div>
+          <div class="result-actions">
+            <a class="action-button action-button--primary" id="open-report" href="#" target="_blank" rel="noopener">Open client deck</a>
+            <a class="action-button" id="open-specialist" href="#" target="_blank" rel="noopener">Specialist report</a>
+            <a class="action-button" id="download-report" href="#">Download HTML</a>
+            <button class="action-button" id="new-audit" type="button">New audit</button>
+          </div>
+        </div>
+        <div class="result-metrics">
+          <div class="metric"><strong id="conversion-score">—</strong><span>Conversion</span></div>
+          <div class="metric"><strong id="visibility-score">—</strong><span>Visibility</span></div>
+          <div class="metric"><strong id="root-layer">—</strong><span>Root layer</span></div>
+          <div class="metric"><strong id="priority-count">—</strong><span>Priority fixes</span></div>
+        </div>
+      </section>
+
+      <section class="error-state" id="error-state" aria-hidden="true" role="alert">
+        <h2>Audit could not finish</h2>
+        <p id="error-message">Check the URL and try again.</p>
+      </section>
     </section>
   </main>
 

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light">
-  <title>{{ audit.brand.name }} &middot; Website Review</title>
+  <title>{{ audit.brand.name }} Website Review</title>
   <style>
     :root {
       --brand: {{ audit.brand.primary_hex }};
@@ -18,105 +18,137 @@
       --display: {% if audit.brand.display_font %}'{{ audit.brand.display_font }}', {% endif %}Georgia, serif;
       --body: {% if audit.brand.body_font %}'{{ audit.brand.body_font }}', {% endif %}Arial, sans-serif;
     }
+
     * { box-sizing: border-box; }
-    html, body { margin: 0; }
-    body { background: var(--paper); color: var(--ink); font-family: var(--body); line-height: 1.65; }
+    html { scroll-behavior: smooth; }
+    html, body { margin: 0; overflow-x: clip; }
+    body { background: var(--paper); color: var(--ink); font-family: var(--body); line-height: 1.5; }
     a, button { -webkit-tap-highlight-color: transparent; }
     a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
-
     [contenteditable]:focus { outline: 2px dashed var(--accent); outline-offset: 4px; border-radius: 2px; }
 
-    .bar {
-      align-items: center; background: color-mix(in srgb, var(--paper) 94%, transparent);
-      border-bottom: 1px solid var(--rule); backdrop-filter: blur(12px);
-      display: flex; gap: 8px; justify-content: space-between;
-      padding: 10px clamp(20px, 4vw, 48px); position: sticky; top: 0; z-index: 20;
-      flex-wrap: wrap;
+    .actions {
+      align-items: center;
+      background: color-mix(in srgb, var(--paper) 94%, transparent);
+      border-bottom: 1px solid var(--rule);
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      min-height: 58px;
+      padding: 10px clamp(16px, 4vw, 48px);
+      position: sticky;
+      top: 0;
+      z-index: 20;
     }
-    .bar__brand { font-family: var(--display); font-weight: 700; font-size: .95rem; }
-    .bar__tools { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
-    .btn {
-      align-items: center; background: transparent; border: 1px solid var(--rule);
-      border-radius: 5px; color: var(--ink); cursor: pointer; display: inline-flex;
-      font: 700 .72rem/1 var(--body); justify-content: center; min-height: 34px;
-      padding: 0 11px; text-decoration: none; transition: background .15s, border-color .15s;
-      white-space: nowrap;
+    .actions strong { font-family: var(--display); font-size: 1.05rem; }
+    .actions__links { display: flex; flex-wrap: wrap; gap: 8px; }
+    .button {
+      align-items: center;
+      background: transparent;
+      border: 1px solid var(--ink);
+      border-radius: 4px;
+      color: var(--ink);
+      cursor: pointer;
+      display: inline-flex;
+      font-family: var(--body);
+      font-size: .75rem;
+      font-weight: 700;
+      justify-content: center;
+      min-height: 36px;
+      padding: 0 12px;
+      text-decoration: none;
+      transition: background .15s, color .15s;
     }
-    .btn:hover { border-color: var(--muted); }
-    .btn--primary { background: var(--ink); border-color: var(--ink); color: var(--white); }
-    .btn--primary:hover { opacity: .88; }
-    .btn--edit { border-color: var(--accent); color: var(--accent); }
-    .btn--edit.is-active { background: var(--accent); color: var(--white); border-color: var(--accent); }
+    .button:hover { background: var(--ink); color: var(--white); }
+    .button--primary { background: var(--ink); color: var(--white); }
+    .button--primary:hover { opacity: .88; }
+    .button--edit { border-color: var(--accent); color: var(--accent); }
+    .button--edit.is-active { background: var(--accent); border-color: var(--accent); color: var(--white); }
+    .button--edit.is-active:hover { opacity: .88; }
+
+    .slide {
+      border-bottom: 1px solid var(--rule);
+      min-height: min(82vh, 760px);
+      padding: clamp(48px, 8vw, 104px) clamp(20px, 8vw, 112px);
+    }
+    .slide__inner { margin: 0 auto; max-width: 1120px; }
+    .kicker {
+      color: var(--accent);
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      margin: 0 0 18px;
+      text-transform: uppercase;
+    }
+    h1, h2, h3, p { overflow-wrap: normal; word-break: normal; }
+    h1, h2 { font-family: var(--display); font-weight: 400; letter-spacing: 0; }
+    h1 { font-size: clamp(3rem, 8vw, 7rem); line-height: .92; margin: 0; max-width: 12ch; }
+    h2 { font-size: clamp(2.3rem, 5.5vw, 5rem); line-height: .98; margin: 0; max-width: 16ch; }
+    h3 { font-size: 1.08rem; line-height: 1.25; margin: 0 0 8px; }
+    p { margin: 0; }
+    .lead { color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.35rem); margin-top: 24px; max-width: 60ch; }
 
     .cover {
-      background: var(--brand);
-      background-image: {% if audit.brand.hero_image_url %}linear-gradient(90deg, rgba(0,0,0,.6), rgba(0,0,0,.12)), url('{{ audit.brand.hero_image_url }}'){% else %}none{% endif %};
-      background-position: center; background-size: cover;
-      color: var(--white); padding: clamp(56px, 10vw, 120px) clamp(20px, 5vw, 64px);
+      background-color: var(--brand);
+      background-image:
+        linear-gradient(90deg, rgba(0,0,0,.68), rgba(0,0,0,.18)),
+        {% if audit.brand.hero_image_url %}url('{{ audit.brand.hero_image_url }}'){% else %}none{% endif %};
+      background-position: center;
+      background-size: cover;
+      color: var(--white);
+      display: grid;
+      min-height: calc(100vh - 58px);
+      place-items: end start;
+      position: relative;
     }
-    .cover__inner { margin: 0 auto; max-width: 960px; }
-    .cover__meta { display: flex; flex-wrap: wrap; font-size: .75rem; gap: 8px 20px; margin-bottom: 24px; text-transform: uppercase; opacity: .8; }
-    .cover__logo { display: block; height: 52px; margin-bottom: 24px; max-width: 200px; object-fit: contain; object-position: left center; }
-    .cover h1 { font-family: var(--display); font-size: clamp(2.4rem, 7vw, 5.4rem); font-weight: 400; line-height: .92; margin: 0; max-width: 14ch; }
-    .cover .lead { color: rgba(255,255,255,.85); font-size: clamp(1rem, 2vw, 1.3rem); margin-top: 20px; max-width: 56ch; }
+    .cover .slide__inner { margin: 0; max-width: 1180px; width: 100%; }
+    .cover__meta { display: flex; flex-wrap: wrap; font-size: .75rem; gap: 8px 20px; margin-bottom: 28px; text-transform: uppercase; }
+    .cover .lead { color: rgba(255,255,255,.86); max-width: 54ch; }
+    .cover__logo { display: block; height: 62px; margin-bottom: 28px; max-width: 240px; object-fit: contain; object-position: left center; width: auto; }
 
-    .section {
-      margin: 0 auto; max-width: 960px;
-      padding: clamp(40px, 6vw, 80px) clamp(20px, 5vw, 64px);
-    }
-    .kicker {
-      color: var(--accent); font-size: .7rem; font-weight: 700;
-      letter-spacing: .08em; margin: 0 0 12px; text-transform: uppercase;
-    }
-    h1, h2, h3, p { overflow-wrap: normal; word-break: normal; margin: 0; }
-    h2 { font-family: var(--display); font-size: clamp(1.8rem, 4vw, 3.2rem); font-weight: 400; line-height: 1.05; max-width: 18ch; }
-    h3 { font-size: 1.1rem; line-height: 1.3; margin: 0 0 6px; }
-    p { margin: 0; }
-    .lead { color: var(--muted); font-size: clamp(1rem, 1.6vw, 1.15rem); margin-top: 16px; max-width: 60ch; }
+    .statement { align-items: end; display: grid; gap: 36px; grid-template-columns: minmax(0, 1.1fr) minmax(260px, .9fr); }
+    .statement__score { border-top: 6px solid var(--accent); padding-top: 20px; }
+    .score { font-family: var(--display); font-size: clamp(4.5rem, 12vw, 9rem); line-height: .8; }
+    .score-label { color: var(--muted); font-size: .78rem; font-weight: 700; margin-top: 20px; text-transform: uppercase; }
+    .score-note { color: var(--muted); font-size: .95rem; margin-top: 12px; max-width: 26ch; }
 
-    .split { display: grid; gap: 32px; grid-template-columns: minmax(0, 1.1fr) minmax(220px, .9fr); align-items: end; }
-    .split__score { border-top: 5px solid var(--accent); padding-top: 16px; }
-    .score { font-family: var(--display); font-size: clamp(4rem, 12vw, 8rem); line-height: .82; }
-    .score-label { color: var(--muted); font-size: .75rem; font-weight: 700; margin-top: 16px; text-transform: uppercase; }
-    .score-note { color: var(--muted); font-size: .88rem; margin-top: 8px; max-width: 24ch; }
-
-    .section--tint { background: var(--soft); }
-    .section--dark { background: var(--ink); color: var(--white); }
-    .section--dark .lead { color: rgba(255,255,255,.7); }
-    .section--dark .kicker { color: var(--accent); }
-    .section--dark .list li { border-color: rgba(255,255,255,.2); }
-    .section--dark .list p { color: rgba(255,255,255,.7); }
-
-    .cols { display: grid; gap: clamp(20px, 4vw, 48px); grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 32px; }
+    .columns { display: grid; gap: clamp(24px, 5vw, 64px); grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 48px; }
     .list { list-style: none; margin: 0; padding: 0; }
-    .list li { border-top: 1px solid var(--rule); padding: 14px 0; }
+    .list li { border-top: 1px solid var(--rule); padding: 18px 0; }
     .list p { color: var(--muted); }
 
     .quote {
-      border-left: 5px solid var(--accent);
+      border-left: 6px solid var(--accent);
       font-family: var(--display);
-      font-size: clamp(1.4rem, 3.5vw, 2.8rem);
-      line-height: 1.08; margin: 28px 0 0; max-width: 18ch; padding-left: 18px;
+      font-size: clamp(1.8rem, 4vw, 3.6rem);
+      line-height: 1.08;
+      margin: 42px 0 0;
+      max-width: 22ch;
+      padding-left: 24px;
     }
 
-    .score-list { margin-top: 28px; }
+    .score-list { margin-top: 42px; }
     .score-row {
-      align-items: start; border-top: 1px solid var(--rule);
-      display: grid; gap: 12px 20px;
-      grid-template-columns: minmax(140px, .75fr) 56px minmax(0, 1.6fr);
-      padding: 16px 0;
+      align-items: start;
+      border-top: 1px solid var(--rule);
+      display: grid;
+      gap: 16px 28px;
+      grid-template-columns: minmax(180px, .8fr) 72px minmax(0, 1.6fr);
+      padding: 20px 0;
     }
-    .score-row strong { font-size: .92rem; }
-    .score-row__value { font-family: var(--display); font-size: 1.4rem; line-height: 1; }
+    .score-row strong { font-size: 1rem; }
+    .score-row__value { font-family: var(--display); font-size: 1.65rem; line-height: 1; }
     .score-row p { color: var(--muted); }
 
-    .cta-box {
-      background: var(--brand); border-radius: 12px; color: var(--white);
-      padding: 40px 36px; margin-top: 32px;
-    }
-    .cta-box .kicker { color: rgba(255,255,255,.6); }
-    .cta-box .lead { color: rgba(255,255,255,.8); }
-    .cta-box h2 { max-width: 20ch; }
+    .slide--dark { background: var(--ink); color: var(--white); }
+    .slide--dark .lead, .slide--dark .list p { color: rgba(255,255,255,.7); }
+    .slide--dark .list li { border-color: rgba(255,255,255,.22); }
+    .slide--dark .score-row { border-color: rgba(255,255,255,.22); }
+    .slide--dark .score-row p { color: rgba(255,255,255,.65); }
+    .slide--soft { background: var(--soft); }
+    .next-step { background: var(--ink); color: var(--white); }
+    .next-step .lead { color: rgba(255,255,255,.75); }
+    .next-step h2 { max-width: 18ch; }
 
     .toast {
       position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
@@ -126,33 +158,46 @@
     }
     .toast.show { opacity: 1; }
 
-    @media (max-width: 700px) {
-      .split, .cols { grid-template-columns: minmax(0, 1fr); }
+    @media (max-width: 800px) {
+      .statement, .columns { grid-template-columns: minmax(0, 1fr); }
       .score-row { grid-template-columns: minmax(0, 1fr) auto; }
       .score-row p { grid-column: 1 / -1; }
-      .bar { flex-direction: column; align-items: flex-start; }
-      .bar__tools { width: 100%; }
-      .bar__tools .btn { flex: 1; }
+      .cover { background-attachment: scroll; }
+    }
+    @media (max-width: 560px) {
+      .actions { align-items: flex-start; flex-direction: column; }
+      .actions__links { width: 100%; }
+      .button { flex: 1; }
+      .slide { min-height: auto; padding-left: 18px; padding-right: 18px; }
+      h1 { font-size: clamp(2.7rem, 16vw, 4.7rem); }
+      h2 { font-size: clamp(2.2rem, 12vw, 3.5rem); }
     }
     @media print {
-      .bar, .toast { display: none; }
+      @page { margin: 0; size: landscape; }
+      body { background: var(--white); }
+      .actions { display: none; }
+      .toast { display: none; }
+      .slide { break-after: page; min-height: 100vh; }
+      .cover { min-height: 100vh; }
     }
   </style>
 </head>
 <body>
-  <nav class="bar" aria-label="Report tools">
-    <div class="bar__brand">{{ audit.brand.name }}</div>
-    <div class="bar__tools">
-      <button class="btn btn--edit" type="button" id="toggle-edit" onclick="toggleEdit()">Edit</button>
-      <button class="btn" type="button" onclick="saveEdits()">Save</button>
-      <button class="btn btn--primary" type="button" onclick="downloadSelf()">Export HTML</button>
+  <nav class="actions" aria-label="Report actions">
+    <strong>{{ audit.brand.name }} website review</strong>
+    <div class="actions__links">
+      <button class="button button--edit" type="button" id="toggle-edit" onclick="toggleEdit()">Edit</button>
+      <button class="button" type="button" onclick="saveEdits()">Save</button>
+      <a class="button" href="/api/report/{{ report_id }}/pdf/slide" download>PDF Slide Deck</a>
+      <a class="button" href="/api/report/{{ report_id }}/pdf/document" download>PDF Document</a>
+      <button class="button button--primary" type="button" onclick="downloadSelf()">Export HTML</button>
     </div>
   </nav>
   <div id="toast" class="toast"></div>
 
   <main>
-    <header class="cover">
-      <div class="cover__inner">
+    <header class="slide cover">
+      <div class="slide__inner">
         {% if audit.brand.logo_url %}
         <img class="cover__logo" src="{{ audit.brand.logo_url }}" alt="{{ audit.brand.name }} logo">
         {% endif %}
@@ -166,136 +211,170 @@
       </div>
     </header>
 
-    <section class="section">
-      <div class="split">
+    <section class="slide">
+      <div class="slide__inner statement">
         <div>
           <p class="kicker">The short answer</p>
           <h2>{{ audit.client_review.headline }}</h2>
           <p class="lead">The site already has a clear point of view. The next gain comes from making the choice, proof, and next step easier.</p>
         </div>
-        <div class="split__score">
+        <div class="statement__score">
           <div class="score">{{ audit.conversion.score }}</div>
-          <div class="score-label">Conversion readiness</div>
-          <p class="score-note">Directional score. Shows how clearly the site sells the next step today.</p>
+          <div class="score-label">Current conversion readiness</div>
+          <p class="score-note">This is a directional score. It shows how clearly the site sells the next step today.</p>
         </div>
       </div>
     </section>
 
-    <section class="section section--tint">
-      <p class="kicker">What already works</p>
-      <h2>Keep the parts that help people understand the business.</h2>
-      <ul class="list cols">
-        {% for item in audit.client_review.strengths %}
-        <li><h3>{{ item }}</h3></li>
-        {% endfor %}
-      </ul>
+    {% if audit.client_review.strengths %}
+    <section class="slide slide--dark">
+      <div class="slide__inner">
+        <p class="kicker">What already works</p>
+        <h2>Keep the parts that help people understand the business.</h2>
+        <ul class="list columns">
+          {% for item in audit.client_review.strengths %}
+          <li><h3>{{ item }}</h3></li>
+          {% endfor %}
+        </ul>
+      </div>
     </section>
+    {% endif %}
 
-    <section class="section">
-      <p class="kicker">What a visitor may think</p>
-      <h2>The website is clear at first. The buying decision gets harder later.</h2>
-      <ul class="list cols">
-        {% for item in audit.client_review.visitor_view %}
-        <li><h3>{{ item.title }}</h3><p>{{ item.text }}</p></li>
-        {% endfor %}
-      </ul>
+    {% if audit.client_review.visitor_view %}
+    <section class="slide slide--soft">
+      <div class="slide__inner">
+        <p class="kicker">What a visitor may think</p>
+        <h2>The website is clear at first. The buying decision gets harder later.</h2>
+        <ul class="list columns">
+          {% for item in audit.client_review.visitor_view %}
+          <li><h3>{{ item.title }}</h3><p>{{ item.text }}</p></li>
+          {% endfor %}
+        </ul>
+      </div>
     </section>
+    {% endif %}
 
-    <section class="section section--tint">
-      <p class="kicker">Copy review</p>
-      <h2>The message recognizes the problem. It needs more proof and fewer abstract words.</h2>
-      {% if audit.client_review["copy"].quote %}
-      <blockquote class="quote">"{{ audit.client_review["copy"].quote }}"</blockquote>
-      {% endif %}
-      <div class="cols">
-        <div>
-          <h3>What works</h3>
-          <ul class="list">
-            {% for item in audit.client_review["copy"].works %}<li><p>{{ item }}</p></li>{% endfor %}
-          </ul>
-        </div>
-        <div>
-          <h3>What weakens it</h3>
-          <ul class="list">
-            {% for item in audit.client_review["copy"].risks %}<li><p>{{ item }}</p></li>{% endfor %}
-          </ul>
+    {% if audit.client_review.copy %}
+    <section class="slide">
+      <div class="slide__inner">
+        <p class="kicker">Copy review</p>
+        <h2>The message recognizes the problem. It needs more proof and fewer abstract words.</h2>
+        {% if audit.client_review.copy.quote %}
+        <blockquote class="quote">{{ audit.client_review.copy.quote }}</blockquote>
+        {% endif %}
+        <div class="columns">
+          {% if audit.client_review.copy.works %}
+          <div>
+            <h3>What works</h3>
+            <ul class="list">
+              {% for item in audit.client_review.copy.works %}<li><p>{{ item }}</p></li>{% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+          {% if audit.client_review.copy.risks %}
+          <div>
+            <h3>What weakens it</h3>
+            <ul class="list">
+              {% for item in audit.client_review.copy.risks %}<li><p>{{ item }}</p></li>{% endfor %}
+            </ul>
+          </div>
+          {% endif %}
         </div>
       </div>
     </section>
+    {% endif %}
 
-    <section class="section">
-      <p class="kicker">Design review</p>
-      <h2>The visual system is mostly clear. The final judgment needs the rendered pages.</h2>
-      <div class="cols">
-        <div><h3>What the code shows</h3><p class="lead" style="margin-top:8px">{{ audit.client_review.design.works }}</p></div>
-        <div><h3>What still needs checking</h3><p class="lead" style="margin-top:8px">{{ audit.client_review.design.risk }}</p></div>
+    {% if audit.client_review.design %}
+    <section class="slide slide--soft">
+      <div class="slide__inner">
+        <p class="kicker">Design review</p>
+        <h2>The visual system is strong. The final judgment needs the rendered pages.</h2>
+        <div class="columns">
+          <div><h3>What the code shows</h3><p class="lead" style="margin-top:8px">{{ audit.client_review.design.works }}</p></div>
+          <div><h3>What still needs checking</h3><p class="lead" style="margin-top:8px">{{ audit.client_review.design.risk }}</p></div>
+        </div>
       </div>
     </section>
+    {% endif %}
 
-    {% if audit.mode in ["conversion", "full"] %}
-    <section class="section section--tint">
-      <p class="kicker">What would make this stronger</p>
-      <h2>Every score comes with the next move.</h2>
-      <div class="score-list">
-        {% for item in audit.client_review.conversion_path %}
-        <div class="score-row">
-          <strong>{{ item.plain_name }}</strong>
-          <span class="score-row__value">{{ item.score }}/{{ item.max }}</span>
-          <p>{{ item.to_10 }}</p>
+    {% if audit.mode in ["conversion", "full"] and audit.client_review.conversion_path %}
+    <section class="slide">
+      <div class="slide__inner">
+        <p class="kicker">What would make this stronger</p>
+        <h2>Every score comes with the next move.</h2>
+        <div class="score-list">
+          {% for item in audit.client_review.conversion_path %}
+          <div class="score-row">
+            <strong>{{ item.plain_name }}</strong>
+            <span class="score-row__value">{{ item.score }}/{{ item.max }}</span>
+            <p>{{ item.to_10 }}</p>
+          </div>
+          {% endfor %}
         </div>
-        {% endfor %}
       </div>
     </section>
     {% endif %}
 
     {% if audit.mode in ["visibility", "full"] %}
-    <section class="section section--dark">
-      <p class="kicker">Search and AI visibility</p>
-      <h2>Being easy to quote is not the same as being easy to understand.</h2>
-      <p class="lead" style="margin-top:20px">{{ audit.client_review.visibility_explanation }}</p>
-      <div class="score-list">
-        {% for item in audit.client_review.visibility_path %}
-        <div class="score-row">
-          <strong>{{ item.name }}</strong>
-          <span class="score-row__value">{{ item.score }}/{{ item.max }}</span>
-          <p>{{ item.to_10 }}</p>
+    <section class="slide slide--dark">
+      <div class="slide__inner">
+        <p class="kicker">Search and AI visibility</p>
+        <h2>Being easy to quote is not the same as being easy to understand.</h2>
+        {% if audit.client_review.visibility_explanation %}
+        <p class="lead">{{ audit.client_review.visibility_explanation }}</p>
+        {% endif %}
+        {% if audit.client_review.visibility_path %}
+        <div class="score-list">
+          {% for item in audit.client_review.visibility_path %}
+          <div class="score-row">
+            <strong>{{ item.name }}</strong>
+            <span class="score-row__value">{{ item.score }}/{{ item.max }}</span>
+            <p>{{ item.to_10 }}</p>
+          </div>
+          {% endfor %}
         </div>
-        {% endfor %}
+        {% endif %}
       </div>
     </section>
     {% endif %}
 
     {% if audit.opportunities %}
-    <section class="section">
-      <p class="kicker">Growth ideas</p>
-      <h2>Use the audit to create the easiest next offer.</h2>
-      <div class="cols">
-        {% for item in audit.opportunities[:4] %}
-        <div>
-          <h3>{{ item.title }}</h3>
-          <p class="lead" style="margin-top:8px">{{ item.why }}</p>
-          <ul class="list" style="margin-top:16px">
-            <li><p><strong>Format:</strong> {{ item.format }}</p></li>
-            <li><p><strong>Next step:</strong> {{ item.next_step }}</p></li>
-          </ul>
+    <section class="slide">
+      <div class="slide__inner">
+        <p class="kicker">Growth ideas</p>
+        <h2>Use the audit to create the easiest next offer.</h2>
+        <div class="columns">
+          {% for item in audit.opportunities[:4] %}
+          <div>
+            <h3>{{ item.title }}</h3>
+            <p class="lead" style="margin-top:8px">{{ item.why }}</p>
+            <ul class="list" style="margin-top: 20px;">
+              <li><p><strong>Format:</strong> {{ item.format }}</p></li>
+              <li><p><strong>Next step:</strong> {{ item.next_step }}</p></li>
+            </ul>
+          </div>
+          {% endfor %}
         </div>
-        {% endfor %}
       </div>
     </section>
     {% endif %}
 
-    <section class="section section--tint">
-      <p class="kicker">First week</p>
-      <h2>Start with the changes that make the buying decision easier.</h2>
-      <ol class="list">
-        {% for item in audit.seven_day_plan[:5] %}
-        <li><h3>{{ loop.index }}. {{ item }}</h3></li>
-        {% endfor %}
-      </ol>
+    {% if audit.seven_day_plan %}
+    <section class="slide slide--soft">
+      <div class="slide__inner">
+        <p class="kicker">First week</p>
+        <h2>Start with the changes that make the buying decision easier.</h2>
+        <ol class="list">
+          {% for item in audit.seven_day_plan[:5] %}
+          <li><h3>{{ loop.index }}. {{ item }}</h3></li>
+          {% endfor %}
+        </ol>
+      </div>
     </section>
+    {% endif %}
 
-    <section class="section">
-      <div class="cta-box">
+    <section class="slide next-step">
+      <div class="slide__inner">
         <p class="kicker">Next step</p>
         {% if audit.conversion.rewrite_eligible %}
         <h2>The main decisions are clear enough to begin a focused copy rewrite.</h2>
@@ -303,7 +382,7 @@
         <h2>Choose the offer path first. Then rewrite the copy around that decision.</h2>
         {% endif %}
         {% if audit.client_review.main_next_step %}
-        <p class="lead" style="margin-top:12px"><strong>Main next step:</strong> {{ audit.client_review.main_next_step }}</p>
+        <p class="lead"><strong>Main next step:</strong> {{ audit.client_review.main_next_step }}</p>
         {% endif %}
       </div>
     </section>
@@ -315,9 +394,9 @@
     function toggleEdit() {
       var btn = document.getElementById("toggle-edit");
       var isEditing = document.body.classList.toggle("is-editing");
-      var els = document.querySelectorAll("main h1, main h2, main h3, main h4, main p, main li, main blockquote, main strong, main span, main .score");
+      var els = document.querySelectorAll("main h1, main h2, main h3, main p, main li, main blockquote, main strong, main span");
       for (var i = 0; i < els.length; i++) {
-        if (els[i].closest(".cover__meta")) continue;
+        if (els[i].closest(".actions")) continue;
         els[i].setAttribute("contenteditable", isEditing ? "true" : "false");
       }
       btn.textContent = isEditing ? "Done editing" : "Edit";
@@ -354,7 +433,9 @@
       var link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
       link.download = "{{ report_id }}.html";
+      document.body.appendChild(link);
       link.click();
+      link.remove();
       window.setTimeout(function() { URL.revokeObjectURL(link.href); }, 500);
     }
 
