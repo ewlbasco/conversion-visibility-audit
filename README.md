@@ -44,7 +44,7 @@ Open `http://127.0.0.1:8765`.
 
 ## Live demos
 
-- [Run locally](http://127.0.0.1:8765) — run your own audit on any public URL
+- [Run locally](http://127.0.0.1:8765) — enter any public URL to audit
 
 ## Requirements
 
