@@ -44,8 +44,7 @@ Open `http://127.0.0.1:8765`.
 
 ## Live demos
 
-- [Demo audit on Vercel](https://vercel-share-lime.vercel.app) — full audit example
-- [Run locally](http://127.0.0.1:8765) — run your own audit on any URL
+- [Run locally](http://127.0.0.1:8765) — run your own audit on any public URL
 
 ## Requirements
 
