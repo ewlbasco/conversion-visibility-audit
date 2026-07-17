@@ -79,9 +79,37 @@ Business / Positioning, Messaging, Offer, Trust, and Conversion. Visibility
 covers technical discovery, on-page clarity, content quality, GEO, AEO,
 accessibility, and security.
 
+Visibility mode can run without a model. Conversion and Full audits require
+the semantic scoring path because the tool refuses to invent conversion scores
+without model-backed judgment.
+
 Set `WEBSITE_AUDIT_ENABLE_LLM=1` and configure an OpenAI-compatible `litellm`
 setup before running Conversion or Full audits. Use `WEBSITE_AUDIT_LLM_MODEL` to
 override the model.
+
+### Free local LLM option
+
+You can run the semantic scoring path without a paid API by using a local
+OpenAI-compatible server such as Ollama.
+
+```bash
+ollama pull llama3.2
+export WEBSITE_AUDIT_ENABLE_LLM=1
+export WEBSITE_AUDIT_LLM_API_BASE=http://localhost:11434/v1
+export WEBSITE_AUDIT_LLM_MODEL=llama3.2
+python3 app.py
+```
+
+`WEBSITE_AUDIT_LLM_API_KEY` is optional for local Ollama. The tool sends
+`ollama` as the placeholder key when `WEBSITE_AUDIT_LLM_API_BASE` is set and no
+key is provided.
+
+Expected smoke-test result: the scoring function returns a dictionary with
+`score`, five layer scores, and `source: llm`.
+
+For paid or hosted models, keep `WEBSITE_AUDIT_ENABLE_LLM=1`, set
+`WEBSITE_AUDIT_LLM_MODEL`, and provide either `WEBSITE_AUDIT_LLM_API_KEY` or
+the provider's standard environment variable such as `OPENAI_API_KEY`.
 
 ## License
 

@@ -983,9 +983,21 @@ class AuditEngine:
                 "Install requirements before running conversion or full audits."
             ) from exc
 
+        api_base = os.environ.get("WEBSITE_AUDIT_LLM_API_BASE") or None
+        api_key = (
+            os.environ.get("WEBSITE_AUDIT_LLM_API_KEY")
+            or os.environ.get("OPENAI_API_KEY")
+            or ("ollama" if api_base else None)
+        )
+        client_kwargs: dict[str, Any] = {}
+        if api_base:
+            client_kwargs["base_url"] = api_base
+        if api_key:
+            client_kwargs["api_key"] = api_key
+
         try:
             client = instructor.from_openai(
-                litellm.OpenAI(),
+                litellm.OpenAI(**client_kwargs),
                 mode=instructor.Mode.JSON,
             )
         except Exception as exc:
