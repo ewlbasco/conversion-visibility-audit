@@ -247,7 +247,7 @@ def render_editable_docx(audit: dict, report_id: str) -> Path:
         _add_text(doc, f"{index}. {item}", font=body_font, size=12, color=ink, after=10)
     _add_text(
         doc,
-        "This file is editable. Change the wording, add notes, or import it into Google Docs before creating a final PDF.",
+        "This file is editable. Change the wording, add notes, or import it into Google Docs before creating the final client-ready version.",
         font=body_font,
         size=10,
         color=muted,

@@ -36,7 +36,6 @@ separate services.
 git clone https://github.com/ewlbasco/conversion-visibility-audit.git
 cd conversion-visibility-audit/tool
 pip install -r requirements.txt
-playwright install chromium
 python3 app.py
 ```
 
@@ -64,7 +63,7 @@ git config core.hooksPath .githooks
 ## Requirements
 
 - Python 3.12+
-- Playwright (for PDF export — optional, tool works without it)
+- `requests`, `Jinja2`, and `python-docx`
 
 ## How the audit works
 
@@ -75,6 +74,11 @@ analytics, backlinks, or live AI citations.
 Conversion is scored across five layers: Business / Positioning, Messaging,
 Offer, Trust, and Conversion. Visibility covers technical discovery, on-page
 clarity, content quality, GEO, AEO, accessibility, and security.
+
+By default, conversion scoring is deterministic and heuristic. Optional LLM
+scoring is opt-in with `WEBSITE_AUDIT_ENABLE_LLM=1` and a configured
+OpenAI-compatible `litellm` setup; use `WEBSITE_AUDIT_LLM_MODEL` to override the
+model.
 
 ## License
 

@@ -447,7 +447,7 @@
           {% if audit.mode in ["conversion", "full"] %}
           <article class="score-block">
             <div class="score-block__value">{{ audit.conversion.score }}</div>
-            <div class="score-block__label">Conversion readiness / 100</div>
+            <div class="score-block__label">Conversion readiness / 100 <span style="display:inline-block;font-size:0.6rem;font-family:var(--font-mono);background:var(--color-accent);color:var(--color-white);padding:0.15rem 0.5rem;border-radius:4px;vertical-align:middle;margin-left:0.4rem;text-transform:uppercase;letter-spacing:0.05em">{{ audit.conversion.score_source }}</span></div>
             <p class="score-block__note">Root layer: {{ audit.conversion.root_layer }}. This score reflects how much friction the current site creates before the next step.</p>
           </article>
           {% endif %}
@@ -682,7 +682,7 @@
         <header class="section__head">
           <h2>What happens next</h2>
           {% if audit.mode in ["conversion", "full"] and audit.conversion.rewrite_eligible %}
-          <p>The upstream decisions are clear enough to move into a complete section-by-section copy rewrite. Review this audit in the editable Google Doc before final PDF delivery.</p>
+          <p>The upstream decisions are clear enough to move into a complete section-by-section copy rewrite. Review this audit in the editable working document before final delivery.</p>
           {% else %}
           <p>Resolve the upstream decisions identified in this audit first. Once they are clear, the next step is a complete section-by-section copy rewrite, followed by implementation only if needed.</p>
           {% endif %}

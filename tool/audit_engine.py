@@ -9,6 +9,7 @@ from html.parser import HTMLParser
 from ipaddress import ip_address
 import json
 import math
+import os
 import re
 import socket
 from typing import Any
@@ -16,6 +17,17 @@ from urllib.parse import urljoin, urlsplit, urlunsplit
 
 import requests
 
+try:
+    from pydantic import BaseModel, Field
+    HAS_PYDANTIC = True
+except ImportError:
+    class BaseModel:
+        pass
+
+    def Field(default: Any, **_: Any) -> Any:
+        return default
+
+    HAS_PYDANTIC = False
 
 MAX_RESPONSE_BYTES = 2_000_000
 MAX_PAGES = 8
@@ -910,6 +922,7 @@ class AuditEngine:
                 "root_layer": conversion["root_layer"],
                 "rewrite_eligible": conversion["rewrite_eligible"],
                 "findings": [finding.as_dict() for finding in conversion["findings"]],
+                "score_source": conversion.get("score_source", "heuristic"),
             },
             "visibility": {
                 "measured_score": visibility["measured_score"],
@@ -932,10 +945,95 @@ class AuditEngine:
                 "This local build reads server HTML and linked public CSS/JavaScript, but it does not execute a rendered browser session.",
                 "Core Web Vitals, rendered visual hierarchy, contrast, keyboard behavior, analytics, backlinks, rankings, competitors, and AI-platform citations are not measured in this MVP.",
                 "Detected brand colors and fonts are public-code cues and must be verified before client delivery.",
+                f"Conversion scoring source: {conversion.get('score_source', 'heuristic')}. When 'heuristic', scores come from keyword/pattern detection. When 'llm', scores come from LLM semantic analysis of page text.",
                 "A complete conversion judgment also requires rendered desktop and mobile review plus strategic copy review.",
                 "The design score is a heuristic scan based on HTML/CSS signals (typography count, color palette size, premium language balance, alt-text coverage). A full rendered visual audit requires the hallmark skill or a human designer.",
             ],
         }
+
+    # ── LLM-based REAL conversion scoring ─────────────────────────────────
+    # Uses instructor + litellm for genuine semantic analysis.
+    # Falls back to HEURISTIC keyword scoring when LLM is unavailable.
+
+    class _ConversionScores(BaseModel):
+        business_positioning: int = Field(..., ge=0, le=20, description="Score 0-20: Does the site clearly state who it's for and what changes?")
+        messaging: int = Field(..., ge=0, le=20, description="Score 0-20: Is the primary message clear, specific, and buyer-focused?")
+        offer: int = Field(..., ge=0, le=20, description="Score 0-20: Is the offer easy to understand and choose from?")
+        trust: int = Field(..., ge=0, le=20, description="Score 0-20: Does the site provide verifiable proof and trust signals?")
+        conversion: int = Field(..., ge=0, le=20, description="Score 0-20: Is the path to action clear, low-friction, and specific?")
+
+    @staticmethod
+    def _llm_conversion_scores(
+        page_text: str,
+        homepage_title: str,
+        homepage_description: str,
+        desired_outcome: str,
+    ) -> dict[str, Any] | None:
+        """REAL conversion scoring via LLM. Returns None if unavailable."""
+        if os.environ.get("WEBSITE_AUDIT_ENABLE_LLM") != "1" or not HAS_PYDANTIC:
+            return None
+
+        try:
+            import instructor
+            import litellm
+        except ImportError:
+            return None
+
+        # Use instructor with litellm via the OpenAI-compatible interface
+        try:
+            client = instructor.from_openai(
+                litellm.OpenAI(),
+                mode=instructor.Mode.JSON,
+            )
+        except Exception:
+            return None
+
+        system_prompt = (
+            "You are an expert conversion auditor. Given a website's page text, "
+            "score five conversion dimensions 0-20. Use 20 as 'exceptional — no improvement needed' "
+            "and 0 as 'completely absent or damaging'. Be critical: most sites score 5-15 per dimension. "
+            "Base scores on the actual text content, not the industry or business type. "
+            "If a dimension cannot be assessed from the text, score it at 10 (neutral/mixed signals)."
+        )
+
+        text_sample = " ".join(page_text.split()[:2000])
+
+        user_prompt = (
+            f"Website title: {homepage_title}\n"
+            f"Description: {homepage_description}\n"
+            f"Desired outcome: {desired_outcome}\n\n"
+            f"Page text:\n{text_sample}\n"
+        )
+
+        try:
+            scores, _ = client.chat.completions.create_with_completion(
+                model=os.environ.get("WEBSITE_AUDIT_LLM_MODEL", "gpt-4o-mini"),
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": user_prompt},
+                ],
+                response_model=AuditEngine._ConversionScores,
+                max_retries=1,
+            )
+            return {
+                "score": sum([
+                    scores.business_positioning,
+                    scores.messaging,
+                    scores.offer,
+                    scores.trust,
+                    scores.conversion,
+                ]),
+                "layers": {
+                    "Business / Positioning": scores.business_positioning,
+                    "Messaging": scores.messaging,
+                    "Offer": scores.offer,
+                    "Trust": scores.trust,
+                    "Conversion": scores.conversion,
+                },
+                "source": "llm",
+            }
+        except Exception:
+            return None
 
     def conversion_audit(self, pages: list[PageEvidence], context: str) -> dict[str, Any]:
         homepage = pages[0]
@@ -943,6 +1041,19 @@ class AuditEngine:
         title_meta = " ".join([homepage.title, homepage.description, context]).lower()
         findings: list[Finding] = []
         business_context = self.infer_business_context(pages)
+
+        # ── REAL LLM scoring with HEURISTIC fallback ─────────────────────
+        llm_scores = self._llm_conversion_scores(
+            page_text=all_text,
+            homepage_title=homepage.title,
+            homepage_description=homepage.description,
+            desired_outcome=context,
+        )
+        conversion_score_source = "heuristic"
+
+        if llm_scores is not None:
+            conversion_score_source = "llm"
+
         layers = {
             "Business / Positioning": 20,
             "Messaging": 20,
@@ -1306,6 +1417,10 @@ class AuditEngine:
                 )
             )
 
+        # If LLM scoring succeeded, override layers with REAL LLM scores
+        if llm_scores is not None:
+            layers = llm_scores["layers"]
+
         root_layer = min(layers, key=layers.get)
         unresolved_upstream = root_layer in {"Business / Positioning", "Offer"} and layers[root_layer] < 14
         return {
@@ -1314,6 +1429,7 @@ class AuditEngine:
             "root_layer": root_layer,
             "rewrite_eligible": not unresolved_upstream,
             "findings": findings,
+            "score_source": conversion_score_source,
         }
 
     @staticmethod

@@ -181,14 +181,34 @@ def main() -> int:
         ROOT / "tool" / "static" / "app.js",
         ROOT / "tool" / "requirements.txt",
     ]
-    forbidden_powerpoint_markers = ("PowerPoint", ".pptx", "pptx_url", "/pptx")
+    forbidden_export_markers = (
+        "PowerPoint",
+        ".pptx",
+        "pptx_url",
+        "/pptx",
+        "PDF",
+        ".pdf",
+        "pdf_url",
+        "/pdf",
+        "pdf_renderer",
+        "Playwright",
+        "playwright",
+    )
     for path in active_surface_files:
         text = path.read_text(encoding="utf-8")
-        for marker in forbidden_powerpoint_markers:
+        for marker in forbidden_export_markers:
             if marker in text:
                 failures.append(
-                    f"{path.relative_to(ROOT)} contains forbidden PowerPoint/PPTX marker: {marker}"
+                    f"{path.relative_to(ROOT)} contains forbidden export marker: {marker}"
                 )
+
+    stale_export_files = (
+        ROOT / "tool" / "pptx_renderer.py",
+        ROOT / "tool" / "pdf_renderer.py",
+    )
+    for path in stale_export_files:
+        if path.exists():
+            failures.append(f"Stale export renderer must not be active: {path.relative_to(ROOT)}")
 
     if failures:
         print("BUNDLE VALIDATION: FAIL")

@@ -83,40 +83,6 @@ class AuditRequestHandler(SimpleHTTPRequestHandler):
                 return
             self.send_file(OUTPUT_DIR / f"{report_id}.html", "text/html; charset=utf-8", attachment=True)
             return
-        if path.startswith("/api/report/") and path.endswith("/pdf/slide"):
-            report_id = path.removeprefix("/api/report/").removesuffix("/pdf/slide").strip("/")
-            if not report_id or slugify(report_id) != report_id:
-                self.send_error(HTTPStatus.BAD_REQUEST)
-                return
-            html_path = OUTPUT_DIR / f"{report_id}.html"
-            if not html_path.is_file():
-                self.send_error(HTTPStatus.NOT_FOUND)
-                return
-            try:
-                from pdf_renderer import render_pdf
-                pdf_path = OUTPUT_DIR / f"{report_id}-slide.pdf"
-                render_pdf(html_path, pdf_path, as_slide_deck=True)
-                self.send_file(pdf_path, "application/pdf", attachment=True)
-            except Exception as exc:
-                self.send_json({"error": f"PDF generation failed: {exc}"}, HTTPStatus.INTERNAL_SERVER_ERROR)
-            return
-        if path.startswith("/api/report/") and path.endswith("/pdf/document"):
-            report_id = path.removeprefix("/api/report/").removesuffix("/pdf/document").strip("/")
-            if not report_id or slugify(report_id) != report_id:
-                self.send_error(HTTPStatus.BAD_REQUEST)
-                return
-            html_path = OUTPUT_DIR / f"{report_id}-specialist.html"
-            if not html_path.is_file():
-                self.send_error(HTTPStatus.NOT_FOUND)
-                return
-            try:
-                from pdf_renderer import render_pdf
-                pdf_path = OUTPUT_DIR / f"{report_id}-document.pdf"
-                render_pdf(html_path, pdf_path, as_slide_deck=False)
-                self.send_file(pdf_path, "application/pdf", attachment=True)
-            except Exception as exc:
-                self.send_json({"error": f"PDF generation failed: {exc}"}, HTTPStatus.INTERNAL_SERVER_ERROR)
-            return
         if path == "/api/health":
             self.send_json({"status": "ok", "service": "website-audit-mvp"})
             return

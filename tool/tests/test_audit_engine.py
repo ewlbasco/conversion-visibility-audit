@@ -236,6 +236,8 @@ class ReportTests(unittest.TestCase):
         self.assertIn("Example &lt;script&gt;", html)
         self.assertNotIn(".pptx", html)
         self.assertNotIn("PowerPoint", html)
+        self.assertNotIn(".pdf", html)
+        self.assertNotIn("PDF", html)
         self.assertIn('href="test-report-specialist.html"', html)
         self.assertIn("Direct.", html)
         self.assertIn("Needs proof.", html)
