@@ -7,6 +7,7 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
+import report_renderer  # noqa: E402
 from audit_engine import (  # noqa: E402
     AuditEngine,
     EvidenceParser,
@@ -167,6 +168,10 @@ class ParserTests(unittest.TestCase):
 
 
 class ReportTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.test_output_dir = ROOT / "outputs" / "_archived" / "test-runs"
+        self.test_output_dir.mkdir(parents=True, exist_ok=True)
+
     def test_app_contract_uses_html_source_and_pdf_exports(self) -> None:
         app_text = (ROOT / "app.py").read_text(encoding="utf-8")
         static_text = (ROOT / "static" / "index.html").read_text(encoding="utf-8")
@@ -304,7 +309,8 @@ class ReportTests(unittest.TestCase):
             "seven_day_plan": ["Fix the offer ladder."],
             "limitations": ["Directional score."],
         }
-        report_id, path = render_report(audit, "test-report")
+        with patch.object(report_renderer, "OUTPUT_DIR", self.test_output_dir):
+            report_id, path = render_report(audit, "test-report")
         html = path.read_text(encoding="utf-8")
         self.assertEqual(report_id, "test-report")
         self.assertNotIn("<script>alert(1)</script>", html)
@@ -382,7 +388,8 @@ class ReportTests(unittest.TestCase):
             "seven_day_plan": ["Fix the offer ladder."],
             "limitations": ["Automated check."],
         }
-        bundle = render_report_bundle(audit, "test-report-bundle")
+        with patch.object(report_renderer, "OUTPUT_DIR", self.test_output_dir):
+            bundle = render_report_bundle(audit, "test-report-bundle")
         self.assertTrue(bundle["client_html"].is_file())
         self.assertTrue(bundle["specialist_html"].is_file())
         self.assertTrue(bundle["index_html"].is_file())
